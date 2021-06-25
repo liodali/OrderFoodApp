@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dali.hamza.core.datasource.network.AppClientApi
 import dali.hamza.orderfoodapp.R
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -53,5 +54,11 @@ object AppModule {
         .client(okHttpClient)
         //.addConverterFactory(moshiConverter)
         .build()
+
+    @Singleton
+    @Provides
+    fun provideClientApi(
+        retrofit: Retrofit
+    ): AppClientApi = retrofit.create(AppClientApi::class.java)
 
 }
