@@ -2,4 +2,5 @@
     <string name="app_name">OrderFoodApp</string>
     <string name="db_name">FoodAppDb</string>
     <string name="server" />
+    <string name="order_page">orders</string>
 </resources>
