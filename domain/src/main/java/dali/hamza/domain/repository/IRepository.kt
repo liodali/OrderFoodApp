@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface IRepository<T> {
 
-    fun getAll(): Flow<IResponse>
+    suspend fun getAll(): Flow<IResponse>
 
 }
