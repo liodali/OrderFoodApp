@@ -1,7 +1,8 @@
-package dali.hamza.orderfoodapp
+package dali.hamza.orderfoodapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import dali.hamza.orderfoodapp.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
