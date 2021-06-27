@@ -6,8 +6,9 @@ import dali.hamza.domain.models.IResponse
 import dali.hamza.domain.repository.IOrderRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class OrderRepository(
+class OrderRepository @Inject constructor(
     private val clientApi: AppClientApi
 ) : IOrderRepository {
 

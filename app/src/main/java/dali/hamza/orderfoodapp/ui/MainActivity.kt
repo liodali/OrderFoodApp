@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
 import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
 import dali.hamza.orderfoodapp.R
 import dali.hamza.orderfoodapp.ui.MainActivity.Companion.orderViewModelComposition
@@ -18,6 +19,7 @@ import dali.hamza.orderfoodapp.ui.compose.page.OrderComposePage
 import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
 import dali.hamza.orderfoodapp.viewmodel.OrderViewModel
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     companion object {
         val orderViewModelComposition =

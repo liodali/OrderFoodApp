@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">OrderFoodApp</string>
     <string name="db_name">FoodAppDb</string>
-    <string name="server" />
+    <string name="server">https://foodingredientapi.herokuapp.com</string>
     <string name="order_page">orders</string>
+    <string name="auto_reject_label">Auto reject</string>
+    <string name="loadingText">Loading ...</string>
+    <string name="ordersLabelPage">Orders</string>
 </resources>
