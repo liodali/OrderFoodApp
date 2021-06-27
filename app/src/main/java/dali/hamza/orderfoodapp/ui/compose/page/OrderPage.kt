@@ -96,7 +96,7 @@ fun ListOrders(orders: List<Order>) {
         }
         else -> {
             @OptIn(ExperimentalFoundationApi::class)
-            LazyVerticalGrid(cells = GridCells.Fixed(1)) {
+            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
                 items(orders) { order ->
                     ItemOrderCompose(itemOrder = order)
                 }

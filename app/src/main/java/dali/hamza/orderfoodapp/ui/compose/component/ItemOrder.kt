@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,9 +77,31 @@ fun HeaderItemOrderCompose(itemOrder: Order) {
                     ) {
                         append(stringResource(id = R.string.auto_reject_label))
                     }
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append(getDiffTime(itemOrder.expiredAt, itemOrder.createdAt))
+                    }
                 },
             )
         }
+    }
+}
+
+fun getDiffTime(expired: String, created: String): String {
+    val dateExpiration = DateManager.difference2Date(
+        d2 = DateManager.format.parse(expired),
+        d1 = DateManager.format.parse(created)
+    )
+    return when {
+        dateExpiration.days > 0 -> "  ${dateExpiration.days}days"
+        dateExpiration.hours > 0 -> "  ${dateExpiration.hours}hours"
+        dateExpiration.minutes > 0 ->"  ${dateExpiration.minutes}min"
+        dateExpiration.seconds > 0 ->" ${dateExpiration.seconds}second"
+        else -> "undefined"
     }
 }
 
@@ -104,7 +127,8 @@ fun BodyItemOrderCompose(itemOrder: Order) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.15f)
-                    .wrapContentWidth(align = Alignment.End).padding(vertical = 3.dp)
+                    .wrapContentWidth(align = Alignment.End)
+                    .padding(vertical = 3.dp)
             ) {
                 Button(
                     shape = RoundedCornerShape(24.dp),
@@ -121,10 +145,12 @@ fun BodyItemOrderCompose(itemOrder: Order) {
                 }
             )
             Column(
-                modifier = Modifier.padding(
-                    start = 5.dp,
-                    end = 5.dp
-                ).weight(0.8f)
+                modifier = Modifier
+                    .padding(
+                        start = 5.dp,
+                        end = 5.dp
+                    )
+                    .weight(0.8f)
             ) {
                 Box(
                     modifier = Modifier
