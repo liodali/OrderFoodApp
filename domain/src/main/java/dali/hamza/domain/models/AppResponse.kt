@@ -5,12 +5,12 @@ abstract class IResponse
 
 sealed class MyResponse<T>(data: T?, error: Any?) : IResponse()
 
-class SuccessResponse<T>(data: T) : MyResponse<T>(
+data class SuccessResponse<T>(val data: T) : MyResponse<T>(
     data = data,
     error = null
 )
 
-class ErrorResponse<T>(error: Any) : MyResponse<T>(
+class ErrorResponse(error: Any) : MyResponse<Any>(
     data = null,
     error = error
 )

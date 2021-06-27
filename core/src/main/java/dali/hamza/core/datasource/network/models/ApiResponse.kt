@@ -10,11 +10,9 @@ data class Status(
 )
 
 
-sealed class ApiResponse(
-    @Json(name = "status") open val status: Status,
-)
+
 
 data class OrderResponse(
-    @Json(name = "status") override val status: Status,
+    @Json(name = "status")  val status: Status,
     @Json(name = "data") val data: List<Order>
-) : ApiResponse(status)
+)

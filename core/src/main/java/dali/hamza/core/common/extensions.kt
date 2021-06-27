@@ -34,19 +34,19 @@ fun <T, R : Any> Response<T>.data(
             return SuccessResponse(mapTo(it))
         }
         onFailure {
-            return ErrorResponse(it)
+            return ErrorResponse(it) as MyResponse<R>
         }
         return ErrorResponse(
             error = Exception("GENERAL_NETWORK_ERROR")
-        )
+        ) as MyResponse<R>
     } catch (e1: IOException) {
         return ErrorResponse(
             error = IOException("GENERAL_NETWORK_ERROR")
-        )
+        ) as MyResponse<R>
     } catch (e: Exception) {
         return ErrorResponse(
             error = Exception(e.fillInStackTrace().message)
-        )
+        ) as MyResponse<R>
     }
 
 }

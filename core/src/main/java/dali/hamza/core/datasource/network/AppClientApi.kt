@@ -8,7 +8,7 @@ interface AppClientApi {
 
 
     @GET("/orders/all")
-    fun getOrders(): Response<OrderResponse>
+    suspend fun getOrders(): Response<OrderResponse>
 
 
 }
