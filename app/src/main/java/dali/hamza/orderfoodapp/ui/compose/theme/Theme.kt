@@ -6,7 +6,6 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import dali.hamza.echangecurrencyapp.ui.compose.theme.*
 
 
 private val DarkColorPalette = darkColors(
@@ -45,7 +44,7 @@ fun FoodAppTheme(
 
     MaterialTheme(
         colors = colors,
-        AppTypography,
+        typography = AppTypography,
         shapes = Shapes,
         content = content
     )
