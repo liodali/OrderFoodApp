@@ -14,6 +14,8 @@ class DateUnitTest {
     @Test
     fun currentCET() {
         val currentDiffCET = DateManager.getTimeCET()
-        assertEquals(currentDiffCET,1)
+        assertEquals(currentDiffCET, 1)
     }
+
+
 }

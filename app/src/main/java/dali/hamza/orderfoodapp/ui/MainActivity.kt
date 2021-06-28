@@ -44,7 +44,10 @@ fun App() {
             composable(started) { backStackEntry ->
                 val orderViewModel = hiltViewModel<OrderViewModel>()
                 CompositionLocalProvider(orderViewModelComposition provides orderViewModel) {
-                    OrderComposePage()
+                    OrderComposePage(retrieve = {
+                        orderViewModel.isLoading = true
+                        orderViewModel.retrieveAllOrder()
+                    })
                 }
             }
 

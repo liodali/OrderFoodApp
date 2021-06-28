@@ -11,10 +11,21 @@ class DateManager {
         private val formatTime = SimpleDateFormat("hh:mm a")
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
-        fun getTimeCET(): Int {
-            val now = now()
-            val nowFormat = SimpleDateFormat("Z").format(now)
-            return nowFormat.substring(1, 3).toInt()
+        fun adjustDateWithCurrentCET(date: String): Date {
+            val cetDiff = getTimeCET()
+            val nDate = format.parse(date)
+            val calExpiration = Calendar.getInstance()
+            calExpiration.time = nDate
+            calExpiration.add(calExpiration.get(Calendar.HOUR), cetDiff)
+            return calExpiration.time
+        }
+
+
+        fun getTimeCET(date: Date? = now()): Int {
+
+            val nowFormat = SimpleDateFormat("Z").format(date)
+            val signe = if (nowFormat.contains("+")) 1 else -1
+            return nowFormat.substring(1, 3).toInt() * signe
         }
 
         fun formatToTime(
