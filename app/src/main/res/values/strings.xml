@@ -6,4 +6,5 @@
     <string name="auto_reject_label">Auto reject</string>
     <string name="loadingText">Loading ...</string>
     <string name="ordersLabelPage">Orders</string>
+    <string name="no_order">We don\'t have any Orders Now</string>
 </resources>

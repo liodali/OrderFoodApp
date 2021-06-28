@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dali.hamza.core.interactor.RetrieveAllOrderUseCase
+import dali.hamza.domain.Order
 import dali.hamza.domain.models.IResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OrderViewModel  @Inject constructor(
+class OrderViewModel @Inject constructor(
     private val retrieveAllOrderUseCase: RetrieveAllOrderUseCase
 ) : ViewModel() {
 
@@ -23,10 +24,25 @@ class OrderViewModel  @Inject constructor(
 
 
     private var mutableFlowOrders: MutableStateFlow<IResponse?> = MutableStateFlow(null)
-    private var stateFlowOrders: StateFlow<IResponse?> = mutableFlowOrders
+    private var stateFlowStateOrders: StateFlow<IResponse?> = mutableFlowOrders
+
+    private var stateFlowOrders: MutableStateFlow<List<Order>> = MutableStateFlow(emptyList())
 
 
-    fun getAllOrders(): StateFlow<IResponse?> = stateFlowOrders
+    fun getAllOrders(): StateFlow<IResponse?> = stateFlowStateOrders
+
+    fun orders(): StateFlow<List<Order>> = stateFlowOrders
+
+    fun init(list: List<Order>) {
+        stateFlowOrders.value = list
+    }
+
+    fun removeOrder(order: Order) {
+        val list = stateFlowOrders.value.toMutableList()
+        list.remove(order)
+        stateFlowOrders.value = list
+
+    }
 
 
     fun retrieveAllOrder() {

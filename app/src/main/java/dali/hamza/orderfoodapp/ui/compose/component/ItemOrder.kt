@@ -22,13 +22,21 @@ import dali.hamza.core.common.DateExpiration
 import dali.hamza.core.common.DateManager
 import dali.hamza.domain.Order
 import dali.hamza.orderfoodapp.R
+import dali.hamza.orderfoodapp.model.OrderTimeUI
 import dali.hamza.orderfoodapp.model.UIOrder
+import dali.hamza.orderfoodapp.ui.MainActivity
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray300
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray400
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray600
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray700
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import android.media.MediaPlayer
+
+import android.media.RingtoneManager
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+
 
 fun showTimeDiffOrder(diffExp: DateExpiration): String {
     return when {
@@ -47,87 +55,80 @@ fun showTimeDiffOrder(diffExp: DateExpiration): String {
 
 
 @Composable
-fun rememberTimerOrderCompose(uiOrder: UIOrder): DateExpiration {
-
-    var expIn by remember {
-        mutableStateOf(uiOrder.dateExpirationIn)
-    }
+fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTimeUI {
     val startTime = uiOrder.dateExpirationIn.seconds.toLong() * 1000
+    var orderExpInTimer by remember {
+        mutableStateOf(
+            OrderTimeUI(
+                uiOrder.dateExpirationIn,
+                null
+            )
+        )
+    }
 
     val scope = rememberCoroutineScope()
-    val timer = object : CountDownTimer(startTime, 1000) {
+    val timer: CountDownTimer by rememberUpdatedState(newValue = object :
+        CountDownTimer(startTime, 1000) {
         override fun onTick(millisecs: Long) {
             val seconds = millisecs / 1000
             val minutes = seconds / 60
-            expIn =
-                DateExpiration(
+            orderExpInTimer = orderExpInTimer.copy(
+                dateExpiration = DateExpiration(
                     0, 0,
                     minutes = minutes.toInt(),
                     seconds = seconds.toInt()
-                )
+                ),
+                timer = this
+            )
+            val alertDate = DateManager.format.parse(uiOrder.order.alertedAt)
+            val nowCET = DateManager.now()
+
+            if (nowCET.time == alertDate.time) {
+                playSound()
+            }
+
         }
 
         override fun onFinish() {
             //...countdown completed
             this.cancel()
         }
-    }
-    LaunchedEffect(key1 = "${uiOrder.order.id}") {
+    })
 
+    LaunchedEffect(key1 = "${uiOrder.order.id * DateManager.now().time}") {
         scope.launch {
             timer.start()
         }
+
     }
-    DisposableEffect("${uiOrder.order.id}") {
+    DisposableEffect("${uiOrder.order.id * DateManager.now().time}") {
 
         onDispose {
             scope.cancel()
         }
     }
 
-    return expIn
-}
-
-fun calculateDiff(uiOrder: UIOrder): UIOrder {
-    var sUiOrder = uiOrder.copy()
-    val expiredDate = DateManager.adjustDateWithCurrentCET(uiOrder.order.expiredAt)
-    when (DateManager.now().before(expiredDate)) {
-        true -> {
-            val diffExpirationDate = DateManager.difference2Date(
-                d2 = expiredDate,
-                d1 = DateManager.now()
-            )
-            sUiOrder = uiOrder.copy(
-                isExpired = diffExpirationDate.minutes == 0 && diffExpirationDate.seconds == 0,
-                dateExpirationIn = diffExpirationDate
-            )
-        }
-        else -> {
-            sUiOrder = sUiOrder.copy(
-                isExpired = true
-            )
-        }
-    }
-    return sUiOrder.copy()
+    return orderExpInTimer
 }
 
 @Composable
-fun ItemOrderCompose(itemOrder: Order) {
+fun ItemOrderCompose(itemOrder: Order, playSound: () -> Unit) {
     val diff = DateManager.difference2Date(
         d2 = DateManager.format.parse(itemOrder.expiredAt),
         d1 = DateManager.format.parse(itemOrder.createdAt)
     )
-    val expIn = rememberTimerOrderCompose(
+    val expInWithTimer = rememberTimerOrderCompose(
         uiOrder = UIOrder(
             order = itemOrder,
             dateExpirationIn = diff
-        )
+        ),
+        playSound = playSound
     )
     //val expIn = viewModel.getExpirationIn().collectAsState()
     val uiOrder = UIOrder(
         order = itemOrder,
-        isExpired = expIn.seconds == 0,
-        dateExpirationIn = expIn
+        isExpired = expInWithTimer.dateExpiration.seconds == 0,
+        dateExpirationIn = expInWithTimer.dateExpiration
     )
 
 
@@ -139,15 +140,21 @@ fun ItemOrderCompose(itemOrder: Order) {
     ) {
         Column() {
             HeaderItemOrderCompose(uiOrder, diff)
-            BodyItemOrderCompose(uiOrder.order, isExpired = uiOrder.isExpired)
+            BodyItemOrderCompose(
+                uiOrder.order,
+                isExpired = uiOrder.isExpired,
+                timer = expInWithTimer.timer
+            )
         }
     }
 }
 
 @Composable
-fun HeaderItemOrderCompose(itemOrder: UIOrder, startDiff: DateExpiration) {
+fun HeaderItemOrderCompose(
+    itemOrder: UIOrder,
+    startDiff: DateExpiration,
+) {
     val progress = itemOrder.dateExpirationIn.seconds.toFloat() / startDiff.seconds.toFloat()
-    println(progress)
     Row() {
         Column(
             Modifier.weight(weight = 0.4f),
@@ -199,15 +206,16 @@ fun HeaderItemOrderCompose(itemOrder: UIOrder, startDiff: DateExpiration) {
             }
 
             SegmentedProgressIndicator(
-                progress = 1 - progress,
+                progress = if (progress < 1) 1 - progress else progress - 1,
                 progressHeight = 4.dp,
                 numberOfSegments = 4,
                 segmentGap = 8.dp,
                 backgroundColor = MaterialTheme.colors.primary,
                 color = Gray700,
                 modifier = Modifier
-                    .fillMaxWidth().wrapContentHeight(align = Alignment.Bottom)
-                    .padding(horizontal = 5.dp,vertical = 8.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(align = Alignment.Bottom)
+                    .padding(horizontal = 5.dp, vertical = 8.dp)
                 //.rotate(180f)
 
             )
@@ -217,7 +225,14 @@ fun HeaderItemOrderCompose(itemOrder: UIOrder, startDiff: DateExpiration) {
 
 
 @Composable
-fun BodyItemOrderCompose(itemOrder: Order, isExpired: Boolean = false) {
+fun BodyItemOrderCompose(
+    itemOrder: Order,
+    isExpired: Boolean = false,
+    timer: CountDownTimer? = null,
+) {
+    val viewModel = MainActivity.orderViewModelComposition.current
+    val context = LocalContext.current
+
     Card(
         elevation = 0.dp,
         modifier = Modifier.fillMaxHeight(),
@@ -243,7 +258,19 @@ fun BodyItemOrderCompose(itemOrder: Order, isExpired: Boolean = false) {
             ) {
                 Button(
                     shape = RoundedCornerShape(24.dp),
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                        if (!isExpired) {
+                            timer!!.cancel()
+                            val notification: Uri =
+                                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                            val player: MediaPlayer = MediaPlayer.create(context, notification)
+                            player.start()
+                        }
+                        viewModel.removeOrder(itemOrder)
+
+
+                    },
+                    enabled = timer != null
                 ) {
                     when (isExpired) {
                         true -> Text("Delete")
