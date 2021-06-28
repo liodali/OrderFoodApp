@@ -4,18 +4,17 @@ import android.os.CountDownTimer
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +26,7 @@ import dali.hamza.orderfoodapp.model.UIOrder
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray300
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray400
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray600
+import dali.hamza.orderfoodapp.ui.compose.theme.Gray700
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
@@ -138,14 +138,16 @@ fun ItemOrderCompose(itemOrder: Order) {
             .fillMaxHeight()
     ) {
         Column() {
-            HeaderItemOrderCompose(uiOrder)
+            HeaderItemOrderCompose(uiOrder, diff)
             BodyItemOrderCompose(uiOrder.order, isExpired = uiOrder.isExpired)
         }
     }
 }
 
 @Composable
-fun HeaderItemOrderCompose(itemOrder: UIOrder) {
+fun HeaderItemOrderCompose(itemOrder: UIOrder, startDiff: DateExpiration) {
+    val progress = itemOrder.dateExpirationIn.seconds.toFloat() / startDiff.seconds.toFloat()
+    println(progress)
     Row() {
         Column(
             Modifier.weight(weight = 0.4f),
@@ -163,30 +165,51 @@ fun HeaderItemOrderCompose(itemOrder: UIOrder) {
             )
         }
         Column(
-            Modifier.weight(
-                weight = 0.7f,
-                fill = true
-            )
+            Modifier
+                .weight(
+                    weight = 0.7f,
+                    fill = true
+                )
+                .wrapContentHeight(align = Alignment.Bottom)
         ) {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 12.sp,
-                            color = Gray600
-                        )
-                    ) {
-                        append(stringResource(id = R.string.auto_reject_label))
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    ) {
-                        append(showTimeDiffOrder(itemOrder.dateExpirationIn))
-                    }
-                },
+
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(align = Alignment.End)
+                    .wrapContentHeight(align = Alignment.Bottom)
+                    .padding(end = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.auto_reject_label),
+                    fontSize = 12.sp,
+                    color = Gray600,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.wrapContentHeight(Alignment.Bottom)
+                )
+                WidthDividerSpacer(
+                    width = 2.dp,
+                    color = Color.Transparent
+                )
+                Text(
+                    text = showTimeDiffOrder(itemOrder.dateExpirationIn),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            SegmentedProgressIndicator(
+                progress = 1 - progress,
+                progressHeight = 4.dp,
+                numberOfSegments = 4,
+                segmentGap = 8.dp,
+                backgroundColor = MaterialTheme.colors.primary,
+                color = Gray700,
+                modifier = Modifier
+                    .fillMaxWidth().wrapContentHeight(align = Alignment.Bottom)
+                    .padding(horizontal = 5.dp,vertical = 8.dp)
+                //.rotate(180f)
+
             )
         }
     }

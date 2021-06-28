@@ -28,7 +28,7 @@ fun WidthDividerSpacer(
 
     Spacer(
         modifier = Modifier
-            .width(width = width).fillMaxHeight()
+            .width(width = width)
             .background(color = color)
     )
 }
