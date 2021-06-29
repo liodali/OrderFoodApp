@@ -11,6 +11,10 @@ data class Status(
 
 
 
+data class AppResponse<T>(
+    @Json(name = "status")  val status: Status,
+    @Json(name = "data") val data: List<T>
+)
 
 data class OrderResponse(
     @Json(name = "status")  val status: Status,

@@ -41,7 +41,14 @@ class HttpCallsTest {
         val response = api.getOrders()
 
         assertEquals(response.isSuccessful, true)
-        assertEquals(response.body()!!.data.size, 9)
+        assertEquals(response.body()!!.data.isEmpty(), false)
+    }
+    @Test
+    fun testIngredients() = runBlocking {
+        val response = api.getIngredients(1)
+
+        assertEquals(response.isSuccessful, true)
+        assertEquals(response.body()!!.data.size, 50)
     }
 
 }
