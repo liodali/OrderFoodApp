@@ -10,10 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dali.hamza.domain.models.Ingredient
 import dali.hamza.orderfoodapp.R
+import dali.hamza.orderfoodapp.ui.compose.theme.Gray400
 import dali.hamza.orderfoodapp.ui.compose.theme.Orange
 
 @Composable
@@ -49,9 +51,11 @@ fun ItemIngredient(ingredient: Ingredient) {
             )
             Text(text = ingredient.name, fontSize = 14.sp)
             Box(
-                modifier = Modifier.wrapContentWidth(
-                    align = Alignment.CenterHorizontally
-                ).padding(5.dp)
+                modifier = Modifier
+                    .wrapContentWidth(
+                        align = Alignment.CenterHorizontally
+                    )
+                    .padding(5.dp)
             ) {
                 QuantityIngredient(ingredient.quantity)
 
@@ -63,7 +67,10 @@ fun ItemIngredient(ingredient: Ingredient) {
 @Composable
 fun QuantityIngredient(quantity: Int) {
     Card(
-        backgroundColor = Orange,
+        backgroundColor = when {
+            quantity > 0 -> Orange
+            else -> Gray400
+        },
         modifier = Modifier
             .width(128.dp)
             .wrapContentWidth(
@@ -76,7 +83,16 @@ fun QuantityIngredient(quantity: Int) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Available", fontSize = 12.sp, color = Color.White)
+            Text(
+                stringResource(
+                    id = when {
+                        quantity > 0 -> R.string.available
+                        else -> R.string.not_available
+                    }
+                ),
+                fontSize = 12.sp,
+                color = Color.White
+            )
             Card(
                 backgroundColor = Color.White,
                 shape = RoundedCornerShape(0.dp),

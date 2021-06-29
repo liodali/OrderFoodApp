@@ -8,4 +8,6 @@
     <string name="ordersLabelPage">Orders</string>
     <string name="no_order">We don\'t have any Orders Now</string>
     <string name="ingredient_page">ingredient</string>
+    <string name="available">Available</string>
+    <string name="not_available">Not Available</string>
 </resources>
