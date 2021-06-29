@@ -14,4 +14,8 @@ data class OrderTimeUI(
     val dateExpiration: DateExpiration,
     val timer: CountDownTimer? = null
 )
+data class SaverOrderUI(
+    val dateExpiration: DateExpiration,
+    val order: Order
+)
 

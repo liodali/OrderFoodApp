@@ -49,7 +49,8 @@ fun App() {
     FoodAppTheme() {
         Scaffold() {
             NavHost(navController, startDestination = "orders") {
-                composable(started) { _ ->
+                composable(started) { backStack ->
+                    
                     val orderViewModel = hiltViewModel<OrderViewModel>()
                     CompositionLocalProvider(
                         orderViewModelComposition provides AppComposition(

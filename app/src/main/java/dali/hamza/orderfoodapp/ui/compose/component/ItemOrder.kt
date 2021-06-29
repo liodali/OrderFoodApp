@@ -36,6 +36,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
+import dali.hamza.orderfoodapp.model.SaverOrderUI
 
 
 fun showTimeDiffOrder(diffExp: DateExpiration): String {
@@ -56,7 +57,32 @@ fun showTimeDiffOrder(diffExp: DateExpiration): String {
 
 @Composable
 fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTimeUI {
-    val startTime = uiOrder.dateExpirationIn.seconds.toLong() * 1000
+
+    var startedSecond = uiOrder.dateExpirationIn.seconds.toLong()
+
+    val viewModel = MainActivity.orderViewModelComposition.current.getVM()
+
+    val diffNowCreated = DateManager.difference2Date(
+        d2 = DateManager.now(),
+        d1 = DateManager.format.parse(uiOrder.order.createdAt)
+    )
+
+    val orders = viewModel.getSaverOrder().value
+    if (orders.isNotEmpty()) {
+
+    }
+
+
+    val diffAlerted = DateManager.difference2Date(
+        d2 = DateManager.format.parse(uiOrder.order.alertedAt),
+        d1 = DateManager.format.parse(uiOrder.order.createdAt)
+    )
+    val startTime =
+        (startedSecond - diffNowCreated.seconds.toLong()) * 1000
+
+    val alerted by remember {
+        mutableStateOf(diffAlerted.seconds.toLong() * 1000)
+    }
     var orderExpInTimer by remember {
         mutableStateOf(
             OrderTimeUI(
@@ -65,7 +91,6 @@ fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTim
             )
         )
     }
-
     val scope = rememberCoroutineScope()
     val timer: CountDownTimer by rememberUpdatedState(newValue = object :
         CountDownTimer(startTime, 1000) {
@@ -80,13 +105,9 @@ fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTim
                 ),
                 timer = this
             )
-            val alertDate = DateManager.format.parse(uiOrder.order.alertedAt)
-            val nowCET = DateManager.now()
-
-            if (nowCET.time == alertDate.time) {
+            if (millisecs == alerted) {
                 playSound()
             }
-
         }
 
         override fun onFinish() {
@@ -101,9 +122,16 @@ fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTim
         }
 
     }
-    DisposableEffect("${uiOrder.order.id * DateManager.now().time}") {
+    DisposableEffect("${uiOrder.order.id}") {
 
         onDispose {
+            viewModel.addSaverOrderExpIn(
+                SaverOrderUI(
+                    order = uiOrder.order,
+                    dateExpiration = orderExpInTimer.dateExpiration,
+                )
+            )
+            timer.cancel()
             scope.cancel()
         }
     }
@@ -117,6 +145,7 @@ fun ItemOrderCompose(itemOrder: Order, playSound: () -> Unit) {
         d2 = DateManager.format.parse(itemOrder.expiredAt),
         d1 = DateManager.format.parse(itemOrder.createdAt)
     )
+
     val expInWithTimer = rememberTimerOrderCompose(
         uiOrder = UIOrder(
             order = itemOrder,
@@ -147,6 +176,7 @@ fun ItemOrderCompose(itemOrder: Order, playSound: () -> Unit) {
             )
         }
     }
+
 }
 
 @Composable
@@ -154,7 +184,28 @@ fun HeaderItemOrderCompose(
     itemOrder: UIOrder,
     startDiff: DateExpiration,
 ) {
-    val progress = itemOrder.dateExpirationIn.seconds.toFloat() / startDiff.seconds.toFloat()
+    var order = itemOrder
+    var progress = itemOrder.dateExpirationIn.seconds.toFloat() / startDiff.seconds.toFloat()
+    if (progress == 1f) {
+        val diffNowCreated = DateManager.difference2Date(
+            d2 = DateManager.now(),
+            d1 = DateManager.format.parse(itemOrder.order.createdAt)
+        )
+        if (diffNowCreated.seconds != 0) {
+            val passedSecond =
+                (itemOrder.dateExpirationIn.seconds.toFloat() - diffNowCreated.seconds.toFloat())
+            progress =
+                passedSecond / startDiff.seconds.toFloat()
+
+            order = order.copy(
+                dateExpirationIn = order.dateExpirationIn.copy(
+                    seconds = passedSecond.toInt(),
+                    minutes = order.dateExpirationIn.minutes - (diffNowCreated.seconds / 60)
+                )
+            )
+        }
+
+    }
     Row() {
         Column(
             Modifier.weight(weight = 0.4f),
@@ -199,7 +250,7 @@ fun HeaderItemOrderCompose(
                     color = Color.Transparent
                 )
                 Text(
-                    text = showTimeDiffOrder(itemOrder.dateExpirationIn),
+                    text = showTimeDiffOrder(order.dateExpirationIn),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

@@ -38,7 +38,7 @@ fun OrderComposePage(retrieve: () -> Unit) {
     val orderViewModel = orderViewModelComposition.current.getVM()
     val composableScope = rememberCoroutineScope()
     val currentData by rememberUpdatedState(newValue = retrieve)
-    LaunchedEffect(key1 = "Orders") {
+    LaunchedEffect(key1 = orderViewModel) {
         composableScope.launch(IO) {
             currentData()
         }
@@ -69,34 +69,28 @@ fun BodyScaffoldOrderPage() {
     val navHostController = orderViewModelComposition.current.getController()
     val routes = rememberRoutesNames()
     Column() {
-        Box(
+        Card(
             Modifier
-                .fillMaxWidth()
-                .height(48.dp)
+                .fillMaxWidth().height(48.dp)
         ) {
-            Card(
-                Modifier
-                    .fillMaxWidth()
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(id = R.string.order_page),
-                        Modifier.weight(0.8f)
+                Text(
+                    stringResource(id = R.string.order_page),
+                    Modifier.weight(0.8f)
+                )
+                IconButton(onClick = {
+                    navHostController.navigate(routes.ingredients)
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_fastfood_24),
+                        contentDescription = "",
+                        tint = when {
+                            isSystemInDarkTheme() -> Color.White
+                            else -> Color.Black
+                        }
                     )
-                    IconButton(onClick = {
-                        navHostController.navigate(routes.ingredients)
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_fastfood_24),
-                            contentDescription = "",
-                            tint = when {
-                                isSystemInDarkTheme() -> Color.White
-                                else -> Color.Black
-                            }
-                        )
-                    }
                 }
             }
         }
