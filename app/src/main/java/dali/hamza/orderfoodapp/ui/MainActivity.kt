@@ -3,6 +3,7 @@ package dali.hamza.orderfoodapp.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -12,14 +13,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import dali.hamza.orderfoodapp.model.AppComposition
 import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
-import dali.hamza.orderfoodapp.R
+import dali.hamza.orderfoodapp.model.Routes.Companion.rememberRoutesNames
 import dali.hamza.orderfoodapp.ui.MainActivity.Companion.ingredientsViewModelComposition
 import dali.hamza.orderfoodapp.ui.MainActivity.Companion.orderViewModelComposition
-import dali.hamza.orderfoodapp.ui.compose.component.rememberRoutesNames
 import dali.hamza.orderfoodapp.ui.compose.page.IngredientsCompose
 import dali.hamza.orderfoodapp.ui.compose.page.OrderComposePage
-import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
 import dali.hamza.orderfoodapp.viewmodel.IngredientsViewModel
 import dali.hamza.orderfoodapp.viewmodel.OrderViewModel
 
@@ -27,9 +27,9 @@ import dali.hamza.orderfoodapp.viewmodel.OrderViewModel
 class MainActivity : AppCompatActivity() {
     companion object {
         val orderViewModelComposition =
-            compositionLocalOf<OrderViewModel> { error("No viewModel found!") }
+            compositionLocalOf<AppComposition<OrderViewModel>> { error("No viewModel found!") }
         val ingredientsViewModelComposition =
-            compositionLocalOf<IngredientsViewModel> { error("No viewModel found!") }
+            compositionLocalOf<AppComposition<IngredientsViewModel>> { error("No viewModel found!") }
 
     }
 
@@ -45,25 +45,39 @@ class MainActivity : AppCompatActivity() {
 fun App() {
     val navController = rememberNavController()
     val routes = rememberRoutesNames()
-    val started = routes.first()
+    val started = routes.orders
     FoodAppTheme() {
-        NavHost(navController, startDestination = started) {
-            composable(started) { backStackEntry ->
-                val orderViewModel = hiltViewModel<OrderViewModel>()
-                CompositionLocalProvider(orderViewModelComposition provides orderViewModel) {
-                    OrderComposePage(retrieve = {
-                        orderViewModel.isLoading = true
-                        orderViewModel.retrieveAllOrder()
-                    })
+        Scaffold() {
+            NavHost(navController, startDestination = "orders") {
+                composable(started) { _ ->
+                    val orderViewModel = hiltViewModel<OrderViewModel>()
+                    CompositionLocalProvider(
+                        orderViewModelComposition provides AppComposition(
+                            orderViewModel,
+                            navController
+                        )
+                    ) {
+                        OrderComposePage(retrieve = {
+                            orderViewModel.retrieveAllOrder()
+                        })
+                    }
                 }
-            }
-            composable(routes.last()) { backStackEntry ->
-                val ingredientsViewModel = hiltViewModel<IngredientsViewModel>()
-                CompositionLocalProvider(ingredientsViewModelComposition provides ingredientsViewModel) {
-                    IngredientsCompose()
+                composable(routes.ingredients) { _ ->
+                    val ingredientsViewModel = hiltViewModel<IngredientsViewModel>()
+                    CompositionLocalProvider(
+                        ingredientsViewModelComposition provides AppComposition(
+                            ingredientsViewModel,
+                            navController
+                        )
+                    ) {
+                        IngredientsCompose() {
+                            ingredientsViewModel.isLoadingCategories = true
+                            ingredientsViewModel.retrieveCategories()
+                        }
+                    }
                 }
-            }
 
+            }
         }
     }
 }

@@ -88,10 +88,3 @@ fun EmptyInformation(
     }
 }
 
-@Composable
-fun rememberRoutesNames(): List<String> {
-    return listOf(
-        stringResource(id = R.string.order_page),
-        stringResource(id = R.string.ingredient_page)
-    )
-}
