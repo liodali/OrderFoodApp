@@ -2,6 +2,7 @@ package dali.hamza.core.datasource.network
 
 import dali.hamza.core.datasource.network.models.AppResponse
 import dali.hamza.core.datasource.network.models.OrderResponse
+import dali.hamza.domain.models.Category
 import dali.hamza.domain.models.Ingredient
 import retrofit2.Response
 import retrofit2.http.GET
@@ -19,5 +20,7 @@ interface AppClientApi {
         @Query("category") category: Int
     ): Response<AppResponse<Ingredient>>
 
-
+    @GET("/category/all")
+    suspend fun getCategories(
+    ): Response<AppResponse<Category>>
 }
