@@ -60,17 +60,17 @@ fun rememberTimerOrderCompose(uiOrder: UIOrder, playSound: () -> Unit): OrderTim
 
     var startedSecond = uiOrder.dateExpirationIn.seconds.toLong()
 
-    val viewModel = MainActivity.orderViewModelComposition.current.getVM()
 
     val diffNowCreated = DateManager.difference2Date(
         d2 = DateManager.now(),
         d1 = DateManager.format.parse(uiOrder.order.createdAt)
     )
+    val viewModel = MainActivity.orderViewModelComposition.current.getVM()
 
-    val orders = viewModel.getSaverOrder().value
-    if (orders.isNotEmpty()) {
-
-    }
+//    val orders = viewModel.getSaverOrder().value
+//    if (orders.isNotEmpty()) {
+//
+//    }
 
 
     val diffAlerted = DateManager.difference2Date(
