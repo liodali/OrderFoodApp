@@ -16,8 +16,11 @@
 
 
 > I used hilt as dependency injection for this project
-> I used compose for UI
+
+> I used the new UI toolkit compose for building UI
+
 > I used retrofit for http calls and flowAPI to collect data
+
 > I build rest api using ktor 
 
 
