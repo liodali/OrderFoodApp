@@ -22,8 +22,8 @@
 
 
 ### screenshots
-<img width="150" height="300" src="/screenshot/emptyview.png" >
-<img width="150" height="300" src="/screenshot/ingredient-main.png" alt="ingredient main">
-<img width="150" height="300" src="/screenshot/ingredient-meal.png" alt="ingredient meal">
-<img width="150" height="300" src="/screenshot/ingredient-other.png" alt="ingredient other">
-<img width="150" height="300" src="/screenshot/orders.png" alt="order">
+<img width="150" height="300" src="/screenshots/emptyview.png" >
+<img width="150" height="300" src="/screenshots/ingredient-main.png" alt="ingredient main">
+<img width="150" height="300" src="/screenshots/ingredient-meal.png" alt="ingredient meal">
+<img width="150" height="300" src="/screenshots/ingredient-other.png" alt="ingredient other">
+<img width="150" height="300" src="/screenshots/orders.png" alt="order">
