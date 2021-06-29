@@ -230,7 +230,7 @@ fun BodyItemOrderCompose(
     isExpired: Boolean = false,
     timer: CountDownTimer? = null,
 ) {
-    val viewModel = MainActivity.orderViewModelComposition.current
+    val viewModel = MainActivity.orderViewModelComposition.current.getVM()
     val context = LocalContext.current
 
     Card(

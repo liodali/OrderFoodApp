@@ -10,30 +10,32 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import dali.hamza.domain.Order
 import dali.hamza.domain.models.ErrorResponse
 import dali.hamza.domain.models.SuccessResponse
 import dali.hamza.orderfoodapp.R
+import dali.hamza.orderfoodapp.model.Routes.Companion.rememberRoutesNames
 import dali.hamza.orderfoodapp.ui.MainActivity.Companion.orderViewModelComposition
 import dali.hamza.orderfoodapp.ui.compose.component.EmptyInformation
 import dali.hamza.orderfoodapp.ui.compose.component.ItemOrderCompose
 import dali.hamza.orderfoodapp.ui.compose.component.LoadingComponent
 import dali.hamza.orderfoodapp.ui.compose.theme.Gray300
-import dali.hamza.orderfoodapp.ui.compose.theme.Gray700
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
 @Composable
 fun OrderComposePage(retrieve: () -> Unit) {
-    val orderViewModel = orderViewModelComposition.current
+    val orderViewModel = orderViewModelComposition.current.getVM()
     val composableScope = rememberCoroutineScope()
     val currentData by rememberUpdatedState(newValue = retrieve)
     LaunchedEffect(key1 = "Orders") {
@@ -62,16 +64,51 @@ fun OrderComposePage(retrieve: () -> Unit) {
 
 @Composable
 fun BodyScaffoldOrderPage() {
-    val viewModel = orderViewModelComposition.current
-    val ordersResponseState = viewModel.getAllOrders().collectAsState()
-    when (ordersResponseState.value) {
-        is ErrorResponse -> {
-
+    val viewModel = orderViewModelComposition.current.getVM()
+    val ordersResponseState = viewModel.getResponseOrders().collectAsState()
+    val navHostController = orderViewModelComposition.current.getController()
+    val routes = rememberRoutesNames()
+    Column() {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            Card(
+                Modifier
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(id = R.string.order_page),
+                        Modifier.weight(0.8f)
+                    )
+                    IconButton(onClick = {
+                        navHostController.navigate(routes.ingredients)
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_fastfood_24),
+                            contentDescription = "",
+                            tint = when {
+                                isSystemInDarkTheme() -> Color.White
+                                else -> Color.Black
+                            }
+                        )
+                    }
+                }
+            }
         }
-        is SuccessResponse<*> -> {
-            val orderResponse = ordersResponseState.value!! as SuccessResponse<List<Order>>
-            viewModel.init(orderResponse.data)
-            ListOrdersCompose()
+        when (ordersResponseState.value) {
+            is ErrorResponse -> {
+
+            }
+            is SuccessResponse<*> -> {
+                val orderResponse = ordersResponseState.value!! as SuccessResponse<List<Order>>
+                viewModel.init(orderResponse.data)
+                ListOrdersCompose()
+            }
         }
     }
 }
@@ -80,7 +117,7 @@ fun BodyScaffoldOrderPage() {
 fun ListOrdersCompose() {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
-    val viewModel = orderViewModelComposition.current
+    val viewModel = orderViewModelComposition.current.getVM()
     val stateOrders = viewModel.orders().collectAsState()
     val listOrders = stateOrders.value
     when {

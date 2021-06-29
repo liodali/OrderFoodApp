@@ -29,7 +29,7 @@ class OrderViewModel @Inject constructor(
     private var stateFlowOrders: MutableStateFlow<List<Order>> = MutableStateFlow(emptyList())
 
 
-    fun getAllOrders(): StateFlow<IResponse?> = stateFlowStateOrders
+    fun getResponseOrders(): StateFlow<IResponse?> = stateFlowStateOrders
 
     fun orders(): StateFlow<List<Order>> = stateFlowOrders
 
@@ -46,6 +46,7 @@ class OrderViewModel @Inject constructor(
 
 
     fun retrieveAllOrder() {
+        isLoading = true
         viewModelScope.launch {
             retrieveAllOrderUseCase.invoke().collect { response ->
                 mutableFlowOrders.value = response
