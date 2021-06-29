@@ -14,9 +14,13 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
 import dali.hamza.orderfoodapp.R
+import dali.hamza.orderfoodapp.ui.MainActivity.Companion.ingredientsViewModelComposition
 import dali.hamza.orderfoodapp.ui.MainActivity.Companion.orderViewModelComposition
+import dali.hamza.orderfoodapp.ui.compose.component.rememberRoutesNames
+import dali.hamza.orderfoodapp.ui.compose.page.IngredientsCompose
 import dali.hamza.orderfoodapp.ui.compose.page.OrderComposePage
 import dali.hamza.orderfoodapp.ui.compose.theme.FoodAppTheme
+import dali.hamza.orderfoodapp.viewmodel.IngredientsViewModel
 import dali.hamza.orderfoodapp.viewmodel.OrderViewModel
 
 @AndroidEntryPoint
@@ -24,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         val orderViewModelComposition =
             compositionLocalOf<OrderViewModel> { error("No viewModel found!") }
+        val ingredientsViewModelComposition =
+            compositionLocalOf<IngredientsViewModel> { error("No viewModel found!") }
 
     }
 
@@ -38,7 +44,8 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun App() {
     val navController = rememberNavController()
-    val started = stringResource(id = R.string.order_page)
+    val routes = rememberRoutesNames()
+    val started = routes.first()
     FoodAppTheme() {
         NavHost(navController, startDestination = started) {
             composable(started) { backStackEntry ->
@@ -48,6 +55,12 @@ fun App() {
                         orderViewModel.isLoading = true
                         orderViewModel.retrieveAllOrder()
                     })
+                }
+            }
+            composable(routes.last()) { backStackEntry ->
+                val ingredientsViewModel = hiltViewModel<IngredientsViewModel>()
+                CompositionLocalProvider(ingredientsViewModelComposition provides ingredientsViewModel) {
+                    IngredientsCompose()
                 }
             }
 

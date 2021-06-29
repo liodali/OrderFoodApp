@@ -7,6 +7,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -83,4 +86,12 @@ fun EmptyInformation(
             modifier = Modifier.padding(vertical = 5.dp)
         )
     }
+}
+
+@Composable
+fun rememberRoutesNames(): List<String> {
+    return listOf(
+        stringResource(id = R.string.order_page),
+        stringResource(id = R.string.ingredient_page)
+    )
 }
